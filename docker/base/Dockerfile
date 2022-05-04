@@ -91,11 +91,11 @@ RUN wget https://download.java.net/java/GA/jdk15.0.2/0d1cfde4252546c6931946de8db
     tar -xzv --strip-components=1 -f openjdk-15.0.2_linux-x64_bin.tar.gz --directory $JAVA_HOME && \
     rm -rf openjdk*.tar.gz $JAVA_HOME/jmods $JAVA_HOME/lib/src.zip
 
-# Install Python 3.
-RUN curl -sS https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tgz | tar -C /tmp -xzv && \
-    cd /tmp/Python-3.7.7 && \
+# Install Python 3.7.13 
+RUN curl -sS https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tgz | tar -C /tmp -xzv && \
+    cd /tmp/Python-3.7.13 && \
     ./configure --enable-optimizations --enable-loadable-sqlite-extensions && make altinstall && \
-    rm -rf /tmp/Python-3.7.7
+    rm -rf /tmp/Python-3.7.13
 RUN pip3.7 install pipenv
 
 RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk main" \
