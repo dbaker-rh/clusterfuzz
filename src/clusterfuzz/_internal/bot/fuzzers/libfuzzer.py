@@ -402,6 +402,11 @@ class LibFuzzerRunner(new_process.UnicodeProcessRunner, LibFuzzerCommon):
                                 artifact_prefix, additional_args, extra_env)
 
 
+class RootLibFuzzerRunner(new_process.RootProcessRunnerMixin,
+                          new_process.UnicodeProcessRunner, LibFuzzerCommon):
+  """LibFuzzerRunner which runs as root."""
+
+
 class UnshareLibFuzzerRunner(new_process.UnshareProcessRunnerMixin,
                              new_process.UnicodeProcessRunner, LibFuzzerCommon):
   """LibFuzzerRunner which unshares."""
@@ -1148,13 +1153,16 @@ class AndroidEmulatorLibFuzzerRunner(AndroidLibFuzzerRunner):
   cleanse_crash = wrap_emulator(AndroidLibFuzzerRunner.cleanse_crash)
 
 
-def get_runner(fuzzer_path, temp_dir=None, use_minijail=None, use_unshare=None):
+def get_runner(fuzzer_path, temp_dir=None, use_minijail=None, use_unshare=None, run_as_root=None):
   """Get a libfuzzer runner."""
   if use_minijail is None:
     use_minijail = environment.get_value('USE_MINIJAIL')
 
   if use_unshare is None:
     use_unshare = environment.get_value('USE_UNSHARE')
+
+  if run_as_root is None:
+    run_as_root = environment.get_value('RUN_FUZZER_AS_ROOT', default_value=False)
 
   if use_minijail is False:
     # If minijail is explicitly disabled, set the environment variable as well.
@@ -1225,6 +1233,8 @@ def get_runner(fuzzer_path, temp_dir=None, use_minijail=None, use_unshare=None):
     runner = AndroidLibFuzzerRunner(fuzzer_path, build_dir)
   elif use_unshare:
     runner = UnshareLibFuzzerRunner(fuzzer_path)  # pylint: disable=too-many-function-args
+  elif run_as_root:
+    runner = RootLibFuzzerRunner(fuzzer_path)  # pylint: disable=too-many-function-args
   else:
     runner = LibFuzzerRunner(fuzzer_path)
 
