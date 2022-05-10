@@ -414,6 +414,44 @@ class UnicodeProcessRunner(UnicodeProcessRunnerMixin, ProcessRunner):
   """ProcessRunner which always returns unicode output."""
 
 
+class RootProcessRunnerMixin(object):
+  """ProcessRunner mixin which runs as root."""
+
+  def get_command(self, additional_args=None):
+    """Overridden get_command."""
+    if environment.platform() != 'LINUX':
+      raise RuntimeError('RootProcessRunner only supported on Linux')
+
+    sudo_path = environment.get_default_tool_path('unshare')
+    if not sudo_path:
+      # This is a different sudo from the system sudo path
+      raise RuntimeError('sudo not found')
+
+    command = [
+        sudo_path,
+        '-E',  # Preserve environment
+        '--non-interactive', # Never ask anything
+        '-u',  # Select the "root" user
+        'root',
+    ]
+
+    command.append(self._executable_path)
+    command.extend(self._default_args)
+
+    if additional_args:
+      command.extend(additional_args)
+
+    return command
+
+
+class RootProcessRunner(RootProcessRunnerMixin, ProcessRunner):
+  """ProcessRunner which runs as root."""
+
+
+class UnicodeRootRunner(RootProcessRunnerMixin, UnicodeProcessRunner):
+  """Unicode root runner."""
+
+
 class UnshareProcessRunnerMixin(object):
   """ProcessRunner mixin which unshares."""
 

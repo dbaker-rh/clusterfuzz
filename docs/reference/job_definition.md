@@ -44,6 +44,8 @@ definition.
   `CORPUS_PRUNE = True` for libFuzzer ASan jobs only. Enabling pruning for a one
   job only is sufficient, as other libFuzzer and AFL jobs use the same corpus
   when running the same fuzz targets.
+* **RUN_FUZZER_AS_ROOT**: runs the fuzzer as root by prefixing the command with
+  sudo (LibFuzzer+Linux only).
 
 ### Blackbox fuzzing specific
 
